@@ -11,15 +11,18 @@ module Vvdc
 
   class Lexer
     def initialize
+      @idx = 0
+      @program = []
       @tokens = []
     end
 
-    def add(type, symbol)
+    def add(type, symbol, advance=0)
       @tokens << Token.new(type, symbol)
+      @idx += advance
     end
 
-    def add_symbol(literal)
-      add(:symbol, literal)
+    def add_symbol(literal, advance=1)
+      add(:symbol, literal, advance)
     end
 
     def digit?(ch)
@@ -34,93 +37,79 @@ module Vvdc
       alphabetic?(ch) || digit?(ch) || ch == "_"
     end
 
+    def peek_char_is(ch)
+      @idx + 1 < @program.length && @program[@idx + 1] == ch
+    end
+
     def scan(program)
-      idx = 0
-      chars = program.chars
-      while idx < chars.length
-        case chars[idx]
+      @program = program.chars
+      while @idx < @program.length
+        case @program[@idx]
         when " "
-          idx += 1
+          @idx += 1
         when "+"
           add_symbol("+")
-          idx += 1
         when "-"
           add_symbol("-")
-          idx += 1
         when "*"
           add_symbol("*")
-          idx += 1
         when ";"
           add_symbol(";")
-          idx += 1
         when "("
           add_symbol("(")
-          idx += 1
         when ")"
           add_symbol(")")
-          idx += 1
         when "{"
           add_symbol("{")
-          idx += 1
         when "}"
           add_symbol("}")
-          idx += 1
         when "="
-          if idx + 1 < program.length && chars[idx + 1] == "="
-            add_symbol("==")
-            idx += 2
+          if self.peek_char_is("=")
+            add_symbol("==", 2)
           else
             add_symbol("=")
-            idx += 1
           end
         when "!"
-          if idx + 1 < program.length && chars[idx + 1] == "="
-            add_symbol("!=")
-            idx += 2
+          if self.peek_char_is("=")
+            add_symbol("!=", 2)
           else
             add_symbol("!")
-            idx += 1
           end
         when "<"
-          if idx + 1 < program.length && chars[idx + 1] == "="
-            add_symbol("<=")
-            idx += 2
+          if self.peek_char_is("=")
+            add_symbol("<=", 2)
           else
             add_symbol("<")
-            idx += 1
           end
         when ">"
-          if idx + 1 < program.length && chars[idx + 1] == "="
-            add_symbol(">=")
-            idx += 2
+          if self.peek_char_is("=")
+            add_symbol(">=", 2)
           else
             add_symbol(">")
-            idx += 1
           end
         else
-          if chars[idx] == "\""
+          if @program[@idx] == "\""
             st = ""
-            idx += 1
-            while idx < program.length && chars[idx] != "\""
-              st << program[idx]
-              idx += 1
+            @idx += 1
+            while @idx < program.length && @program[@idx] != "\""
+              st << program[@idx]
+              @idx += 1
             end
-            idx += 1 # add one for the final "
-            add(:string, st)
-          elsif digit?(chars[idx])
-            numb = chars[idx]
-            idx += 1
-            while idx < program.length && digit?(chars[idx])
-              numb << program[idx]
-              idx += 1
+            add(:string, st, 1) # add one for the final "
+          elsif digit?(@program[@idx])
+            numb = @program[@idx]
+            @idx += 1
+            while @idx < program.length && digit?(@program[@idx])
+              numb << program[@idx]
+              @idx += 1
             end
             add(:number, numb)
           else # Must be an identifier
-            ident = chars[idx]
-            idx += 1
-            while idx < program.length && identifier_char?(chars[idx])
-              ident << program[idx]
-              idx += 1
+            ident = @program[@idx]
+            @idx += 1
+            while @idx < program.length && identifier_char?(@program[@idx])
+              ident << program[@idx]
+              @idx += 1
             end
             add(:identifier, ident)
           end
