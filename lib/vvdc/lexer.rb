@@ -5,6 +5,14 @@ module Vvdc
       @literal = literal
     end
 
+    def to_s
+      @literal
+    end
+
+    def inspect
+      "#{@type}(#{self})"
+    end
+
     attr_reader :type
     attr_reader :literal
 
