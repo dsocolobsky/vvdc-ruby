@@ -9,7 +9,7 @@ class LexerTest < Minitest::Test
 
     tokens = lexer.scan(program)
 
-    assert_equal program.delete(' ').split(''), tokens.map { |token| token.literal }
+    assert_equal program.delete(" ").chars, tokens.map { |token| token.literal }
   end
 
   def test_simple_tokens_no_spaces
@@ -18,7 +18,7 @@ class LexerTest < Minitest::Test
 
     tokens = lexer.scan(program)
 
-    assert_equal program.split(''), tokens.map { |token| token.literal }
+    assert_equal program.chars, tokens.map { |token| token.literal }
   end
 
   def test_combined_tokens
@@ -27,7 +27,7 @@ class LexerTest < Minitest::Test
 
     tokens = lexer.scan(program)
 
-    assert_equal program.split(' '), tokens.map { |token| token.literal }
+    assert_equal program.split(" "), tokens.map { |token| token.literal }
   end
 
   def test_combined_tokens_no_spaces

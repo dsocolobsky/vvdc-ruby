@@ -1,5 +1,4 @@
 module Vvdc
-
   class Token
     def initialize(type, literal)
       @type = type
@@ -20,110 +19,110 @@ module Vvdc
     end
 
     def add_symbol(literal)
-      self.add(:symbol, literal)
+      add(:symbol, literal)
     end
 
     def digit?(ch)
-      48 <= ch.ord and ch.ord <= 57
+      ch.ord >= 48 && ch.ord <= 57
     end
 
     def alphabetic?(ch)
-      (65 <= ch.ord and ch.ord <= 90) or (97 <= ch.ord and ch.ord <= 122)
+      (ch.ord >= 65 && ch.ord <= 90) or (ch.ord >= 97 && ch.ord <= 122)
     end
 
     def identifier_char?(ch)
-      self.alphabetic?(ch) or self.digit?(ch) or ch == "_"
+      alphabetic?(ch) || digit?(ch) || ch == "_"
     end
 
     def scan(program)
       idx = 0
-      chars = program.split('')
+      chars = program.chars
       while idx < chars.length
         case chars[idx]
         when " "
-          idx = idx + 1
+          idx += 1
         when "+"
-          self.add_symbol("+")
-          idx = idx + 1
+          add_symbol("+")
+          idx += 1
         when "-"
-          self.add_symbol("-")
-          idx = idx + 1
+          add_symbol("-")
+          idx += 1
         when "*"
-          self.add_symbol("*")
-          idx = idx + 1
+          add_symbol("*")
+          idx += 1
         when ";"
-          self.add_symbol(";")
-          idx = idx + 1
+          add_symbol(";")
+          idx += 1
         when "("
-          self.add_symbol("(")
-          idx = idx + 1
+          add_symbol("(")
+          idx += 1
         when ")"
-          self.add_symbol(")")
-          idx = idx + 1
+          add_symbol(")")
+          idx += 1
         when "{"
-          self.add_symbol("{")
-          idx = idx + 1
+          add_symbol("{")
+          idx += 1
         when "}"
-          self.add_symbol("}")
-          idx = idx + 1
+          add_symbol("}")
+          idx += 1
         when "="
-          if idx + 1 < program.length and chars[idx+1] == "="
-            self.add_symbol("==")
-            idx = idx + 2
+          if idx + 1 < program.length && chars[idx + 1] == "="
+            add_symbol("==")
+            idx += 2
           else
-            self.add_symbol("=")
-            idx = idx + 1
+            add_symbol("=")
+            idx += 1
           end
         when "!"
-          if idx + 1 < program.length and chars[idx+1] == "="
-            self.add_symbol("!=")
-            idx = idx + 2
+          if idx + 1 < program.length && chars[idx + 1] == "="
+            add_symbol("!=")
+            idx += 2
           else
-            self.add_symbol("!")
-            idx = idx + 1
+            add_symbol("!")
+            idx += 1
           end
         when "<"
-          if idx + 1 < program.length and chars[idx+1] == "="
-            self.add_symbol("<=")
-            idx = idx + 2
+          if idx + 1 < program.length && chars[idx + 1] == "="
+            add_symbol("<=")
+            idx += 2
           else
-            self.add_symbol("<")
-            idx = idx + 1
+            add_symbol("<")
+            idx += 1
           end
         when ">"
-          if idx + 1 < program.length and chars[idx+1] == "="
-            self.add_symbol(">=")
-            idx = idx + 2
+          if idx + 1 < program.length && chars[idx + 1] == "="
+            add_symbol(">=")
+            idx += 2
           else
-            self.add_symbol(">")
-            idx = idx + 1
+            add_symbol(">")
+            idx += 1
           end
         else
           if chars[idx] == "\""
             st = ""
-            idx = idx + 1
-            while idx < program.length and chars[idx] != "\""
+            idx += 1
+            while idx < program.length && chars[idx] != "\""
               st << program[idx]
-              idx = idx + 1
+              idx += 1
             end
-            idx = idx + 1 # add one for the final "
-            self.add(:string, st)
-          elsif self.digit?(chars[idx])
+            idx += 1 # add one for the final "
+            add(:string, st)
+          elsif digit?(chars[idx])
             numb = chars[idx]
-            idx = idx + 1
-            while idx < program.length and self.digit?(chars[idx])
+            idx += 1
+            while idx < program.length && digit?(chars[idx])
               numb << program[idx]
-              idx = idx + 1
+              idx += 1
             end
-            self.add(:number, numb)
-          else  # Must be an identifier
+            add(:number, numb)
+          else # Must be an identifier
             ident = chars[idx]
-            idx = idx + 1
-            while idx < program.length and self.identifier_char?(chars[idx])
+            idx += 1
+            while idx < program.length && identifier_char?(chars[idx])
               ident << program[idx]
-              idx = idx + 1
+              idx += 1
             end
-            self.add(:identifier, ident)
+            add(:identifier, ident)
           end
         end
       end
