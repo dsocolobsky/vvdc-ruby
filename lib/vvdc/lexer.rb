@@ -41,50 +41,62 @@ module Vvdc
       while idx < chars.length
         case chars[idx]
         when " "
-          nil
+          idx = idx + 1
         when "+"
           self.add_symbol("+")
+          idx = idx + 1
         when "-"
           self.add_symbol("-")
+          idx = idx + 1
         when "*"
           self.add_symbol("*")
+          idx = idx + 1
         when ";"
           self.add_symbol(";")
+          idx = idx + 1
         when "("
           self.add_symbol("(")
+          idx = idx + 1
         when ")"
           self.add_symbol(")")
+          idx = idx + 1
         when "{"
           self.add_symbol("{")
+          idx = idx + 1
         when "}"
           self.add_symbol("}")
+          idx = idx + 1
         when "="
           if idx + 1 < program.length and chars[idx+1] == "="
             self.add_symbol("==")
-            idx = idx + 1
+            idx = idx + 2
           else
             self.add_symbol("=")
+            idx = idx + 1
           end
         when "!"
           if idx + 1 < program.length and chars[idx+1] == "="
             self.add_symbol("!=")
-            idx = idx + 1
+            idx = idx + 2
           else
             self.add_symbol("!")
+            idx = idx + 1
           end
         when "<"
           if idx + 1 < program.length and chars[idx+1] == "="
             self.add_symbol("<=")
-            idx = idx + 1
+            idx = idx + 2
           else
             self.add_symbol("<")
+            idx = idx + 1
           end
         when ">"
           if idx + 1 < program.length and chars[idx+1] == "="
             self.add_symbol(">=")
-            idx = idx + 1
+            idx = idx + 2
           else
             self.add_symbol(">")
+            idx = idx + 1
           end
         else
           if chars[idx] == "\""
@@ -94,6 +106,7 @@ module Vvdc
               st << program[idx]
               idx = idx + 1
             end
+            idx = idx + 1 # add one for the final "
             self.add(:string, st)
           elsif self.digit?(chars[idx])
             numb = chars[idx]
@@ -113,7 +126,6 @@ module Vvdc
             self.add(:identifier, ident)
           end
         end
-        idx = idx + 1
       end
 
       @tokens
