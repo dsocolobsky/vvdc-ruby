@@ -16,12 +16,12 @@ module Vvdc
       @tokens = []
     end
 
-    def add(type, symbol, advance=0)
+    def add(type, symbol, advance = 0)
       @tokens << Token.new(type, symbol)
       @idx += advance
     end
 
-    def add_symbol(literal, advance=1)
+    def add_symbol(literal, advance = 1)
       add(:symbol, literal, advance)
     end
 
@@ -64,25 +64,25 @@ module Vvdc
         when "}"
           add_symbol("}")
         when "="
-          if self.peek_char_is("=")
+          if peek_char_is("=")
             add_symbol("==", 2)
           else
             add_symbol("=")
           end
         when "!"
-          if self.peek_char_is("=")
+          if peek_char_is("=")
             add_symbol("!=", 2)
           else
             add_symbol("!")
           end
         when "<"
-          if self.peek_char_is("=")
+          if peek_char_is("=")
             add_symbol("<=", 2)
           else
             add_symbol("<")
           end
         when ">"
-          if self.peek_char_is("=")
+          if peek_char_is("=")
             add_symbol(">=", 2)
           else
             add_symbol(">")
