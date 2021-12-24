@@ -7,6 +7,15 @@ module Vvdc
 
     attr_reader :type
     attr_reader :literal
+
+    @@keywords = {
+      "if" => :keyword_if, "print" => :keyword_print, "while" => :keyword_while,
+      "return" => :keyword_return, "let" => :keyword_let, "fn" => :keyword_fn
+    }
+
+    def self.keywords
+      @@keywords
+    end
   end
 
   class Lexer
@@ -111,7 +120,8 @@ module Vvdc
               ident << program[@idx]
               @idx += 1
             end
-            add(:identifier, ident)
+            type = Token.keywords[ident] || :identifier
+            add(type, ident)
           end
         end
       end

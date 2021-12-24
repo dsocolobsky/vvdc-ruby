@@ -58,4 +58,15 @@ class LexerTest < Minitest::Test
     assert_equal ["42", "<", "16", "==", "banana5", "32"], tokens.map { |token| token.literal }
     assert_equal [:number, :symbol, :number, :symbol, :identifier, :number], tokens.map { |token| token.type }
   end
+
+  def test_keywords
+    lexer = Vvdc::Lexer.new
+    program = "if print while return let fn notakeyword"
+
+    tokens = lexer.scan(program)
+
+    assert_equal program.split(" "), tokens.map { |token| token.literal }
+    assert_equal [:keyword_if, :keyword_print, :keyword_while, :keyword_return,
+      :keyword_let, :keyword_fn, :identifier], tokens.map { |token| token.type }
+  end
 end
