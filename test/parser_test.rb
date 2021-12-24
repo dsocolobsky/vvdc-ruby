@@ -44,4 +44,22 @@ class ParserTest < Minitest::Test
 
     assert_equal [Vvdc::NumericExpression, 3], [not_3.right.class, not_3.right.value]
   end
+
+  def test_addition
+    lexer = Vvdc::Lexer.new
+    program = "5 + 11;"
+    tokens = lexer.scan(program)
+
+    parser = Vvdc::Parser.new
+    expressions = parser.parse(tokens)
+
+    five_plus_eleven = expressions[0]
+    assert_equal Vvdc::AdditionExpression, five_plus_eleven.class
+
+    five = five_plus_eleven.left
+    eleven = five_plus_eleven.right
+
+    assert_equal [Vvdc::NumericExpression, 5], [five.class, five.value]
+    assert_equal [Vvdc::NumericExpression, 11], [eleven.class, eleven.value]
+  end
 end

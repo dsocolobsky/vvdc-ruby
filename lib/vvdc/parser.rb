@@ -9,6 +9,10 @@ module Vvdc
       @value
     end
 
+    def inspect
+      to_s
+    end
+
     attr_reader :token
     attr_reader :value
   end
@@ -36,6 +40,26 @@ module Vvdc
     attr_reader :right
   end
 
+  class AdditionExpression < Expression
+    def initialize(token, left, right)
+      @token = token
+      @value = nil
+      @left = left
+      @right = right
+    end
+
+    def to_s
+      "+"
+    end
+
+    def inspect
+      "[#{@left.inspect} + #{@right.inspect}]"
+    end
+
+    attr_reader :left
+    attr_reader :right
+  end
+
   class Parser
     def initialize
       @idx = 0
@@ -47,7 +71,8 @@ module Vvdc
       @tokens = tokens
 
       while @tokens[@idx]
-        @expressions << parse_expression(@idx)
+        exp = parse_expression(@idx)
+        @expressions << exp unless exp.nil?
       end
 
       @expressions
@@ -60,8 +85,15 @@ module Vvdc
       exp = nil
       case token.type
       when :number
-        exp = NumericExpression.new(token)
-        @idx += 1
+        left = NumericExpression.new(token)
+        next_token = @tokens[from + 1]
+        if next_token && next_token.literal == "+"
+          exp = AdditionExpression.new(next_token, left, parse_expression(from + 2))
+          @idx += 2
+        else
+          exp = left
+          @idx += 1
+        end
       when :string
         exp = StringExpression.new(token)
         @idx += 1
@@ -81,6 +113,10 @@ module Vvdc
       token = @tokens[from]
       case token.literal
       when "!"
+        right = parse_expression(from + 1)
+        exp = NegationExpression.new(token, right)
+        @idx += 2
+      when "+"
         right = parse_expression(from + 1)
         exp = NegationExpression.new(token, right)
         @idx += 2
