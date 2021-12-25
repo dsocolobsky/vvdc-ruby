@@ -13,12 +13,11 @@ module Vvdc
       "#{@type}(#{self})"
     end
 
-    attr_reader :type
-    attr_reader :literal
+    attr_reader :type, :literal
 
     @@keywords = {
-      "if" => :keyword_if, "print" => :keyword_print, "while" => :keyword_while,
-      "return" => :keyword_return, "let" => :keyword_let, "fn" => :keyword_fn
+      'if' => :keyword_if, 'print' => :keyword_print, 'while' => :keyword_while,
+      'return' => :keyword_return, 'let' => :keyword_let, 'fn' => :keyword_fn
     }
 
     def self.keywords
@@ -51,7 +50,7 @@ module Vvdc
     end
 
     def identifier_char?(ch)
-      alphabetic?(ch) || digit?(ch) || ch == "_"
+      alphabetic?(ch) || digit?(ch) || ch == '_'
     end
 
     def peek_char_is(ch)
@@ -62,53 +61,53 @@ module Vvdc
       @program = program.chars
       while @idx < @program.length
         case @program[@idx]
-        when " "
+        when ' '
           @idx += 1
-        when "+"
-          add_symbol("+")
-        when "-"
-          add_symbol("-")
-        when "*"
-          add_symbol("*")
-        when ";"
-          add_symbol(";")
-        when "("
-          add_symbol("(")
-        when ")"
-          add_symbol(")")
-        when "{"
-          add_symbol("{")
-        when "}"
-          add_symbol("}")
-        when "="
-          if peek_char_is("=")
-            add_symbol("==", 2)
+        when '+'
+          add_symbol('+')
+        when '-'
+          add_symbol('-')
+        when '*'
+          add_symbol('*')
+        when ';'
+          add_symbol(';')
+        when '('
+          add_symbol('(')
+        when ')'
+          add_symbol(')')
+        when '{'
+          add_symbol('{')
+        when '}'
+          add_symbol('}')
+        when '='
+          if peek_char_is('=')
+            add_symbol('==', 2)
           else
-            add_symbol("=")
+            add_symbol('=')
           end
-        when "!"
-          if peek_char_is("=")
-            add_symbol("!=", 2)
+        when '!'
+          if peek_char_is('=')
+            add_symbol('!=', 2)
           else
-            add_symbol("!")
+            add_symbol('!')
           end
-        when "<"
-          if peek_char_is("=")
-            add_symbol("<=", 2)
+        when '<'
+          if peek_char_is('=')
+            add_symbol('<=', 2)
           else
-            add_symbol("<")
+            add_symbol('<')
           end
-        when ">"
-          if peek_char_is("=")
-            add_symbol(">=", 2)
+        when '>'
+          if peek_char_is('=')
+            add_symbol('>=', 2)
           else
-            add_symbol(">")
+            add_symbol('>')
           end
         else
-          if @program[@idx] == "\""
-            st = ""
+          if @program[@idx] == '"'
+            st = ''
             @idx += 1
-            while @idx < program.length && @program[@idx] != "\""
+            while @idx < program.length && @program[@idx] != '"'
               st << program[@idx]
               @idx += 1
             end

@@ -1,36 +1,39 @@
-require "minitest/autorun"
+# frozen_string_literal: true
 
-require "vvdc/lexer"
-require "vvdc/parser"
+require 'minitest/autorun'
+
+require 'vvdc/lexer'
+require 'vvdc/parser'
 
 class ParserTest < Minitest::Test
   def test_literals
     lexer = Vvdc::Lexer.new
-    program = "1337 \"banana\" tomato"
+    program = '1337 "banana" tomato'
     tokens = lexer.scan(program)
 
     parser = Vvdc::Parser.new
     expressions = parser.parse(tokens)
 
-    assert_equal ["1337", "banana", "tomato"], expressions.map { |exp| exp.to_s }
-    assert_equal [Vvdc::NumericExpression, Vvdc::StringExpression, Vvdc::IdentifierExpression], expressions.map { |exp| exp.class }
+    assert_equal %w[1337 banana tomato], expressions.map(&:to_s)
+    assert_equal [Vvdc::NumericExpression, Vvdc::StringExpression, Vvdc::IdentifierExpression],
+                 expressions.map(&:class)
   end
 
   def test_negation
     lexer = Vvdc::Lexer.new
-    program = "!42;"
+    program = '!42;'
     tokens = lexer.scan(program)
 
     parser = Vvdc::Parser.new
     expressions = parser.parse(tokens)
 
-    assert_equal [Vvdc::NegationExpression], expressions.map { |exp| exp.class }
+    assert_equal [Vvdc::NegationExpression], expressions.map(&:class)
     assert_equal [Vvdc::NumericExpression, 42], [expressions[0].right.class, expressions[0].right.value]
   end
 
   def test_negation_of_a_negation
     lexer = Vvdc::Lexer.new
-    program = "!!3;"
+    program = '!!3;'
     tokens = lexer.scan(program)
 
     parser = Vvdc::Parser.new
@@ -47,7 +50,7 @@ class ParserTest < Minitest::Test
 
   def test_addition
     lexer = Vvdc::Lexer.new
-    program = "5 + 11;"
+    program = '5 + 11;'
     tokens = lexer.scan(program)
 
     parser = Vvdc::Parser.new
@@ -65,7 +68,7 @@ class ParserTest < Minitest::Test
 
   def test_addition_of_multiple_numbers
     lexer = Vvdc::Lexer.new
-    program = "5 + 11 + 24 + 3;"
+    program = '5 + 11 + 24 + 3;'
     tokens = lexer.scan(program)
 
     parser = Vvdc::Parser.new
@@ -83,7 +86,6 @@ class ParserTest < Minitest::Test
     add_24_3 = add_11_24_3.right
     assert_equal [Vvdc::NumericExpression, 11], [add_11.class, add_11.value]
     assert_equal Vvdc::AdditionExpression, add_24_3.class
-    
 
     add_24 = add_24_3.left
     add_3 = add_24_3.right
