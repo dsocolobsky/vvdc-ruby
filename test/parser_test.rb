@@ -12,7 +12,7 @@ class ParserTest < Minitest::Test
     parser = Vvdc::Parser.new
     expressions = parser.parse(tokens)
 
-    assert_equal [1337, "banana", "tomato"], expressions.map { |exp| exp.to_s }
+    assert_equal ["1337", "banana", "tomato"], expressions.map { |exp| exp.to_s }
     assert_equal [Vvdc::NumericExpression, Vvdc::StringExpression, Vvdc::IdentifierExpression], expressions.map { |exp| exp.class }
   end
 
