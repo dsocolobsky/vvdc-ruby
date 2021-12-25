@@ -27,6 +27,10 @@ class ParserTest < Minitest::Test
     assert_kind_of Vvdc::AdditionExpression, exp
   end
 
+  def expect_substraction(exp)
+    assert_kind_of Vvdc::SubstractionExpression, exp
+  end
+
   def test_literals
     expressions = parse('1337 "banana" tomato')
 
@@ -102,5 +106,19 @@ class ParserTest < Minitest::Test
     expect_addition addition
     expect_number 3, addition.left
     expect_number 15, addition.right
+  end
+
+  def test_return_a_substraction
+    ret = parse("return 23 - 3 - 10;")[0]
+
+    assert_kind_of Vvdc::ReturnExpression, ret
+
+    sub_23_3_10 = ret.right
+    expect_substraction sub_23_3_10
+    expect_number 23, sub_23_3_10.left
+
+    sub_3_10 = sub_23_3_10.right
+    expect_number 3, sub_3_10.left
+    expect_number 10, sub_3_10.right
   end
 end
