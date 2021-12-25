@@ -67,7 +67,7 @@ module Vvdc
 
     def scan_token
       case @program[@idx]
-      when " "
+      when " ", "\n"
         @idx += 1
       when "+"
         add_symbol("+")

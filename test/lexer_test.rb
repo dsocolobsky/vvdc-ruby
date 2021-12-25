@@ -71,4 +71,14 @@ class LexerTest < Minitest::Test
     assert_equal %i[keyword_if keyword_print keyword_while keyword_return
       keyword_let keyword_fn identifier], tokens.map(&:type)
   end
+
+  def test_newlines
+    lexer = Vvdc::Lexer.new
+    program = "if 42\nvariable\n\n\"mystring\""
+
+    tokens = lexer.scan(program)
+
+    assert_equal %w[if 42 variable mystring], tokens.map(&:literal)
+    assert_equal %i[keyword_if number identifier string], tokens.map(&:type)
+  end
 end
