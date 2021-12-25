@@ -14,6 +14,19 @@ class ParserTest < Minitest::Test
     parser.parse(tokens)
   end
 
+  def expect_number(expected, actual)
+    assert_instance_of Vvdc::NumericExpression, actual
+    assert_equal expected, actual.value
+  end
+
+  def expect_negation(exp)
+    assert_kind_of Vvdc::NegationExpression, exp
+  end
+
+  def expect_addition(exp)
+    assert_kind_of Vvdc::AdditionExpression, exp
+  end
+
   def test_literals
     expressions = parse('1337 "banana" tomato')
 
@@ -23,72 +36,63 @@ class ParserTest < Minitest::Test
   end
 
   def test_negation
-    expressions = parse("!42;")
+    exp = parse("!42;")[0]
 
-    assert_equal [Vvdc::NegationExpression], expressions.map(&:class)
-    assert_equal [Vvdc::NumericExpression, 42], [expressions[0].right.class, expressions[0].right.value]
+    expect_negation exp
+    expect_number 42, exp.right
   end
 
   def test_negation_of_a_negation
-    expressions = parse("!!3;")
+    not_not_3 = parse("!!3;")[0]
 
-    not_not_3 = expressions[0]
-    assert_equal Vvdc::NegationExpression, not_not_3.class
+    expect_negation not_not_3
 
     not_3 = not_not_3.right
-    assert_equal Vvdc::NegationExpression, not_3.class
+    expect_negation not_3
 
-    assert_equal [Vvdc::NumericExpression, 3], [not_3.right.class, not_3.right.value]
+    expect_number 3, not_3.right
   end
 
   def test_addition
-    expressions = parse("5 + 11;")
+    five_plus_eleven = parse("5 + 11;")[0]
 
-    five_plus_eleven = expressions[0]
-    assert_equal Vvdc::AdditionExpression, five_plus_eleven.class
+    expect_addition five_plus_eleven
 
-    five = five_plus_eleven.left
-    eleven = five_plus_eleven.right
-
-    assert_equal [Vvdc::NumericExpression, 5], [five.class, five.value]
-    assert_equal [Vvdc::NumericExpression, 11], [eleven.class, eleven.value]
+    expect_number 5, five_plus_eleven.left
+    expect_number 11, five_plus_eleven.right
   end
 
   def test_addition_of_multiple_numbers
-    expressions = parse("5 + 11 + 24 + 3;")
+    add_5_11_24_3 = parse("5 + 11 + 24 + 3;")[0]
 
-    add_5_11_24_3 = expressions[0]
-    assert_equal Vvdc::AdditionExpression, add_5_11_24_3.class
+    expect_addition add_5_11_24_3
+    expect_number 5, add_5_11_24_3.left
 
-    add_5 = add_5_11_24_3.left
     add_11_24_3 = add_5_11_24_3.right
-    assert_equal [Vvdc::NumericExpression, 5], [add_5.class, add_5.value]
-    assert_equal Vvdc::AdditionExpression, add_11_24_3.class
+    expect_addition add_11_24_3
+    expect_number 11, add_11_24_3.left
 
-    add_11 = add_11_24_3.left
     add_24_3 = add_11_24_3.right
-    assert_equal [Vvdc::NumericExpression, 11], [add_11.class, add_11.value]
-    assert_equal Vvdc::AdditionExpression, add_24_3.class
-
-    add_24 = add_24_3.left
-    add_3 = add_24_3.right
-    assert_equal [Vvdc::NumericExpression, 24], [add_24.class, add_24.value]
-    assert_equal [Vvdc::NumericExpression, 3], [add_3.class, add_3.value]
+    expect_addition add_24_3
+    expect_number 24, add_24_3.left
+    expect_number 3, add_24_3.right
   end
 
   def test_return_a_number
     ret = parse("return 42;")[0]
 
-    assert_equal Vvdc::ReturnExpression, ret.class
-    assert_equal [Vvdc::NumericExpression, 42], [ret.right.class, ret.right.value]
+    assert_kind_of Vvdc::ReturnExpression, ret
+    expect_number 42, ret.right
   end
 
   def return_an_addition
     ret = parse("return 3 + 15;")
 
-    assert_equal Vvdc::ReturnExpression, ret.class
+    assert_kind_of Vvdc::ReturnExpression, ret
 
     addition = ret.right
-    assert_equal [Vvdc::AdditionExpression, 3, 15], [addition.class, addition.left.value, addition.right.value]
+    expect_addition addition
+    expect_number 3, addition.left
+    expect_number 15, addition.right
   end
 end
