@@ -65,26 +65,15 @@ module Vvdc
 
     private
 
+    @@simple_symbols = %w[+ - * ; ( ) { }]
+
     def scan_token
-      case @program[@idx]
+      token = @program[@idx]
+      case token
       when " ", "\n"
         @idx += 1
-      when "+"
-        add_symbol("+")
-      when "-"
-        add_symbol("-")
-      when "*"
-        add_symbol("*")
-      when ";"
-        add_symbol(";")
-      when "("
-        add_symbol("(")
-      when ")"
-        add_symbol(")")
-      when "{"
-        add_symbol("{")
-      when "}"
-        add_symbol("}")
+      when *@@simple_symbols
+        add_symbol(token)
       when "="
         peek_char_is("=") ? add_symbol("==", 2) : add_symbol("=")
       when "!"
@@ -94,12 +83,11 @@ module Vvdc
       when ">"
         peek_char_is("=") ? add_symbol(">=", 2) : add_symbol(">")
       else
-        if @program[@idx] == '"'
+        if token == '"'
           scan_string
-        elsif digit?(@program[@idx])
+        elsif digit?(token)
           scan_number
-        else
-          # Must be an identifier
+        else # Must be an identifier
           scan_identifier
         end
       end
