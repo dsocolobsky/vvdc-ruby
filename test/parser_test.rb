@@ -78,6 +78,14 @@ class ParserTest < Minitest::Test
     expect_number 3, add_24_3.right
   end
 
+  def test_substraction
+    sub = parse("24 - 4;")[0]
+
+    assert_kind_of Vvdc::SubstractionExpression, sub
+    expect_number 24, sub.left
+    expect_number 4, sub.right
+  end
+
   def test_return_a_number
     ret = parse("return 42;")[0]
 

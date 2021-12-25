@@ -40,7 +40,7 @@ module Vvdc
     attr_reader :right
   end
 
-  class AdditionExpression < Expression
+  class InfixExpression < Expression
     def initialize(token, left, right)
       @token = token
       @value = nil
@@ -49,15 +49,21 @@ module Vvdc
     end
 
     def to_s
-      "+"
+      @token.literal.to_s
     end
 
     def inspect
-      "[#{@left.inspect} + #{@right.inspect}]"
+      "[#{@left.inspect} #{@token.literal} #{@right.inspect}]"
     end
 
     attr_reader :left
     attr_reader :right
+  end
+
+  class AdditionExpression < InfixExpression
+  end
+
+  class SubstractionExpression < InfixExpression
   end
 
   class ReturnExpression < Expression
@@ -109,7 +115,11 @@ module Vvdc
         next_token = @tokens[from + 1]
         if next_token && next_token.literal == "+"
           right, adv_right = parse_expression(from + 2)
-          exp = AdditionExpression.new(next_token, left, right)
+          exp = AdditionExpression.new(token, left, right)
+          adv = 2 + adv_right
+        elsif next_token && next_token.literal == "-"
+          right, adv_right = parse_expression(from + 2)
+          exp = SubstractionExpression.new(token, left, right)
           adv = 2 + adv_right
         else
           exp = left
