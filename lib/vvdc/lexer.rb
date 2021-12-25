@@ -16,8 +16,8 @@ module Vvdc
     attr_reader :type, :literal
 
     @@keywords = {
-      'if' => :keyword_if, 'print' => :keyword_print, 'while' => :keyword_while,
-      'return' => :keyword_return, 'let' => :keyword_let, 'fn' => :keyword_fn
+      "if" => :keyword_if, "print" => :keyword_print, "while" => :keyword_while,
+      "return" => :keyword_return, "let" => :keyword_let, "fn" => :keyword_fn
     }
 
     def self.keywords
@@ -50,7 +50,7 @@ module Vvdc
     end
 
     def identifier_char?(ch)
-      alphabetic?(ch) || digit?(ch) || ch == '_'
+      alphabetic?(ch) || digit?(ch) || ch == "_"
     end
 
     def peek_char_is(ch)
@@ -59,81 +59,81 @@ module Vvdc
 
     def scan(program)
       @program = program.chars
-      while @idx < @program.length
-        case @program[@idx]
-        when ' '
-          @idx += 1
-        when '+'
-          add_symbol('+')
-        when '-'
-          add_symbol('-')
-        when '*'
-          add_symbol('*')
-        when ';'
-          add_symbol(';')
-        when '('
-          add_symbol('(')
-        when ')'
-          add_symbol(')')
-        when '{'
-          add_symbol('{')
-        when '}'
-          add_symbol('}')
-        when '='
-          if peek_char_is('=')
-            add_symbol('==', 2)
-          else
-            add_symbol('=')
-          end
-        when '!'
-          if peek_char_is('=')
-            add_symbol('!=', 2)
-          else
-            add_symbol('!')
-          end
-        when '<'
-          if peek_char_is('=')
-            add_symbol('<=', 2)
-          else
-            add_symbol('<')
-          end
-        when '>'
-          if peek_char_is('=')
-            add_symbol('>=', 2)
-          else
-            add_symbol('>')
-          end
+      scan_token while @idx < @program.length
+      @tokens
+    end
+
+    private
+
+    def scan_token
+      case @program[@idx]
+      when " "
+        @idx += 1
+      when "+"
+        add_symbol("+")
+      when "-"
+        add_symbol("-")
+      when "*"
+        add_symbol("*")
+      when ";"
+        add_symbol(";")
+      when "("
+        add_symbol("(")
+      when ")"
+        add_symbol(")")
+      when "{"
+        add_symbol("{")
+      when "}"
+        add_symbol("}")
+      when "="
+        peek_char_is("=") ? add_symbol("==", 2) : add_symbol("=")
+      when "!"
+        peek_char_is("=") ? add_symbol("!=", 2) : add_symbol("!")
+      when "<"
+        peek_char_is("=") ? add_symbol("<=", 2) : add_symbol("<")
+      when ">"
+        peek_char_is("=") ? add_symbol(">=", 2) : add_symbol(">")
+      else
+        if @program[@idx] == '"'
+          scan_string
+        elsif digit?(@program[@idx])
+          scan_number
         else
-          if @program[@idx] == '"'
-            st = ''
-            @idx += 1
-            while @idx < program.length && @program[@idx] != '"'
-              st << program[@idx]
-              @idx += 1
-            end
-            add(:string, st, 1) # add one for the final "
-          elsif digit?(@program[@idx])
-            numb = @program[@idx]
-            @idx += 1
-            while @idx < program.length && digit?(@program[@idx])
-              numb << program[@idx]
-              @idx += 1
-            end
-            add(:number, numb)
-          else # Must be an identifier
-            ident = @program[@idx]
-            @idx += 1
-            while @idx < program.length && identifier_char?(@program[@idx])
-              ident << program[@idx]
-              @idx += 1
-            end
-            type = Token.keywords[ident] || :identifier
-            add(type, ident)
-          end
+          # Must be an identifier
+          scan_identifier
         end
       end
+    end
 
-      @tokens
+    def scan_string
+      st = ""
+      @idx += 1
+      while @idx < @program.length && @program[@idx] != '"'
+        st << @program[@idx]
+        @idx += 1
+      end
+      add(:string, st, 1) # add one for the final "
+    end
+
+    def scan_number
+      numb = @program[@idx]
+      @idx += 1
+      while @idx < @program.length && digit?(@program[@idx])
+        numb << @program[@idx]
+        @idx += 1
+      end
+      add(:number, numb)
+    end
+
+    def scan_identifier
+      ident = @program[@idx]
+      @idx += 1
+      while @idx < @program.length && identifier_char?(@program[@idx])
+        ident << @program[@idx]
+        @idx += 1
+      end
+      type = Token.keywords[ident] || :identifier
+      add(type, ident)
     end
   end
 end

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'minitest/autorun'
+require "minitest/autorun"
 
-require 'vvdc/lexer'
-require 'vvdc/parser'
+require "vvdc/lexer"
+require "vvdc/parser"
 
 class ParserTest < Minitest::Test
   def test_literals
@@ -16,12 +16,12 @@ class ParserTest < Minitest::Test
 
     assert_equal %w[1337 banana tomato], expressions.map(&:to_s)
     assert_equal [Vvdc::NumericExpression, Vvdc::StringExpression, Vvdc::IdentifierExpression],
-                 expressions.map(&:class)
+      expressions.map(&:class)
   end
 
   def test_negation
     lexer = Vvdc::Lexer.new
-    program = '!42;'
+    program = "!42;"
     tokens = lexer.scan(program)
 
     parser = Vvdc::Parser.new
@@ -33,7 +33,7 @@ class ParserTest < Minitest::Test
 
   def test_negation_of_a_negation
     lexer = Vvdc::Lexer.new
-    program = '!!3;'
+    program = "!!3;"
     tokens = lexer.scan(program)
 
     parser = Vvdc::Parser.new
@@ -50,7 +50,7 @@ class ParserTest < Minitest::Test
 
   def test_addition
     lexer = Vvdc::Lexer.new
-    program = '5 + 11;'
+    program = "5 + 11;"
     tokens = lexer.scan(program)
 
     parser = Vvdc::Parser.new
@@ -68,7 +68,7 @@ class ParserTest < Minitest::Test
 
   def test_addition_of_multiple_numbers
     lexer = Vvdc::Lexer.new
-    program = '5 + 11 + 24 + 3;'
+    program = "5 + 11 + 24 + 3;"
     tokens = lexer.scan(program)
 
     parser = Vvdc::Parser.new
