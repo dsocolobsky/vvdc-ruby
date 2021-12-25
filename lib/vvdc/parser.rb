@@ -6,7 +6,7 @@ module Vvdc
     end
 
     def to_s
-      @value
+      @value.to_s
     end
 
     def inspect
@@ -71,8 +71,9 @@ module Vvdc
       @tokens = tokens
 
       while @tokens[@idx]
-        exp = parse_expression(@idx)
+        exp, adv = parse_expression(@idx)
         @expressions << exp unless exp.nil?
+        @idx += adv
       end
 
       @expressions
@@ -83,47 +84,50 @@ module Vvdc
       if token.nil? then return end
 
       exp = nil
+      adv = 0
       case token.type
       when :number
         left = NumericExpression.new(token)
         next_token = @tokens[from + 1]
         if next_token && next_token.literal == "+"
-          exp = AdditionExpression.new(next_token, left, parse_expression(from + 2))
-          @idx += 2
+          right, adv_right = parse_expression(from + 2)
+          exp = AdditionExpression.new(next_token, left, right)
+          adv = 2 + adv_right
         else
           exp = left
-          @idx += 1
+          adv = 1
         end
       when :string
         exp = StringExpression.new(token)
-        @idx += 1
+        adv = 1
       when :identifier
         exp = IdentifierExpression.new(token)
-        @idx += 1
+        adv = 1
       when :symbol
-        exp = parse_symbol(from)
+        exp, adv = parse_symbol(from)
       else
-        @idx += 1
+        adv = 1
       end
-      exp
+      [exp, adv]
     end
 
     def parse_symbol(from)
       exp = nil
+      adv = 0
       token = @tokens[from]
       case token.literal
       when "!"
-        right = parse_expression(from + 1)
+        right, adv_right = parse_expression(from + 1)
         exp = NegationExpression.new(token, right)
-        @idx += 2
+        adv = 1 + adv_right
       when "+"
         right = parse_expression(from + 1)
         exp = NegationExpression.new(token, right)
-        @idx += 2
+        adv = 2
       else
-        @idx += 1
+        adv = 1
       end
-      exp
+      [exp, adv]
     end
   end
 end
