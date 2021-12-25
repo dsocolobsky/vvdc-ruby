@@ -60,6 +60,24 @@ module Vvdc
     attr_reader :right
   end
 
+  class ReturnExpression < Expression
+    def initialize(token, right)
+      @token = token
+      @right = right
+      @value = right.value
+    end
+
+    def to_s
+      "return #{@right}"
+    end
+
+    def inspect
+      to_s
+    end
+
+    attr_reader :right
+  end
+
   class Parser
     def initialize
       @idx = 0
@@ -105,6 +123,10 @@ module Vvdc
         adv = 1
       when :symbol
         exp, adv = parse_symbol(from)
+      when :keyword_return
+        right, adv_right = parse_expression(from + 1)
+        exp = ReturnExpression.new(token, right)
+        adv = 1 + adv_right
       else
         adv = 1
       end
