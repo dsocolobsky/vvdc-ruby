@@ -26,4 +26,16 @@ _start:
 int 0x80
 ).strip, code.strip
   end
+
+  def test_return_number
+    code = compile("return 5;")
+
+    assert_equal %(
+section .text
+global _start
+_start:
+mov rbx, 5
+int 0x80
+).strip, code.strip
+  end
 end
